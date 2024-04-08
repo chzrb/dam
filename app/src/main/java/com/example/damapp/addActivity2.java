@@ -1,29 +1,27 @@
 package com.example.damapp;
 
+import android.content.Intent;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
-import android.widget.CursorAdapter;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ImageView;
 import android.widget.ListView;
-import android.widget.TextView;
+import android.widget.SearchView;
 
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 
-public class addActivity2 extends AppCompatActivity {
+import com.google.android.gms.cast.framework.media.ImagePicker;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+public class addActivity2 extends AppCompatActivity   {
+    ImagePicker k;
     ListView lv;
     DBhelper mdb;
-    Cursor cursor;
-    MyCursorAdapter ca;
-   // SQLiteDatabase sqldb;
-   // String[] id;
-  //  String[] first_name;
-  //  String[] last_name;
-  //  int[] tel;
-  //  String[] email;
+   static  MyCursorAdapter adapter  ;
+   MyCursorAdapter mc;
+     ImageView imageView;
+    FloatingActionButton Button;
+    SearchView searchViewl;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,39 +29,47 @@ public class addActivity2 extends AppCompatActivity {
         setContentView(R.layout.activity_add2);
 
         mdb = new DBhelper(addActivity2.this);
-       // lv = findViewById(R.id.lv);
-        cursor = (Cursor) mdb.getEmployee(" ");
-         ca = new MyCursorAdapter(this, cursor);
-        lv = this.findViewById(R.id.lv);
-        lv.setAdapter(ca);
+        Cursor  cursor  = mdb.getEmployee( );
+         lv = findViewById(R.id.lv);
+         adapter = new MyCursorAdapter(addActivity2.this ,cursor );
+          lv.setAdapter(adapter);
 
-        //CursorAdapter ca= new CursorAdapter (this,cursor )
-        //lv.setAdapter(ca);
+          lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+              @Override
+              public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                  Cursor cursor1=(Cursor) adapter.getItem(position);
+                  String i =cursor1.getString(0);
+                  String fn =cursor1.getString(1);
+                  String ln =cursor1.getString(2);
+                  int  te =cursor1.getInt(3);
+                  String em =cursor1.getString(4);
 
+                  Intent intent = new Intent( addActivity2.this,addActivity3.class );
+
+                  intent.putExtra("id",i);
+                  intent.putExtra("fn",fn);
+                  intent.putExtra("ln",ln);
+                  intent.putExtra("te",te);
+                  intent.putExtra("eml",em);
+
+                  startActivity(intent);
+              }
+          });
+
+          searchViewl=findViewById(R.id.Searchl);
+        searchViewl.setOnClickListener(new View.OnClickListener() {
+              @Override
+              public void onClick(View v) {
+                   DBhelper d = new DBhelper(addActivity2.this);
+                   String nn= searchViewl.getQuery().toString().trim();
+
+                   Cursor c= d.Search(nn);
+                  // String i =c.getString(0);
+                   mc =new MyCursorAdapter(addActivity2.this,c);
+                   searchViewl.setSuggestionsAdapter(mc);
+              }
+        });
 
     }
-    // private void did(){
-    //   sqldb = mdb.getReadableDatabase();
-    //  Cursor cursor=sqldb.rawQuery("select frome" +
-    // " * my_employees",null);
-    //  if(cursor.getCount()>0) {
-    //    id =new String[cursor.getCount()];
-    //   first_name=new String[cursor.getCount()];
-    //   last_name=new String[cursor.getCount()];
-    //  tel =new int[cursor.getCount()];
-    //   email=new String[cursor.getCount()];
-    //  int i=0;
-    // while (cursor.moveToNext()){
-    //   id[i]= String.valueOf(cursor.getInt(0));
-    // //first_name[i]= String.valueOf(cursor.getInt(1));
-    // last_name[i]= String.valueOf(cursor.getInt(2));
-    //    tel[i]=cursor.getInt(3);
-    //   email[i]= String.valueOf(cursor.getInt(4));
-    //  i++;
-    // }
-    // MyCursorAdapter adapter = new MyCursorAdapter(this,cursor);
-    // lv.setAdapter(adapter);
-
-    // }
 
 }
